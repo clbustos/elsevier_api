@@ -84,7 +84,7 @@ module Scopus
     uri=get_uri_journal_articles(journal,year)
     completo=false
     acumulado=[]
-    while(!completo) do
+    while !completo do
       xml_response=connect_server(uri)
       if @error
         break

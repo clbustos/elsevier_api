@@ -14,6 +14,7 @@ module Scopus
       attr_reader :doi
       attr_reader :affiliations
       attr_reader :abstract
+      attr_reader :classifications
       def inspect
         "#<#{self.class}:#{self.object_id} @title=#{@title} @journal=#{@journal} @authors=[#{@authors.keys.join(",")}]>"
       end
@@ -22,7 +23,18 @@ module Scopus
         node=x.at_xpath(path)
         (node.nil?) ? nil : node.text
       end
-      
+      # We can't find the affiliation the ussual way
+      # we have to improvise
+      def search_affiliation(afid)
+        x=xml.at_xpath("//affiliation[@afid=\"#{afid}\"]")
+        if !x
+          raise "I can't find affiliation #{afid}"
+        else
+          name=x.xpath("organization").map{|e| e.text}.join(";")
+          country=x.attribute("country").value
+        end
+        {:name=>name, :city=>nil, :country=>country}
+      end
       def process
         @scopus_id=process_path(xml,"//dc:identifier")
         @title=process_path(xml,"//dc:title")
@@ -37,7 +49,21 @@ module Scopus
         #p @abstract
         @authors={}
         @affiliations={}
-        
+        asjc=[]
+        subjabbr=[]
+        xml.xpath("//classificationgroup/classifications[@type='ASJC']/classification").each do |x|
+
+          asjc.push(x.text.to_i)
+        end
+        xml.xpath("//classificationgroup/classifications[@type='SUBJABBR']/classification").each do |x|
+
+          subjabbr.push(x.text)
+        end
+        @classifications={
+            :asjc=>asjc,
+            :subjabbr=>subjabbr
+        }
+
         xml.xpath("/xmlns:abstracts-retrieval-response/xmlns:affiliation").each do |x|
           id=x.attribute("id").value
           name=process_path(x,"xmlns:affilname")
@@ -62,6 +88,9 @@ module Scopus
           affiliation=nil
           affiliation_node=x.at_xpath("xmlns:affiliation")
           affiliation=affiliation_node.attribute("id").text unless affiliation_node.nil?
+          if !affiliation.nil? and @affiliations[affiliation].nil?
+            @affiliations[affiliation]=search_affiliation(affiliation)
+          end
           #p "#{nombre} #{apellido}"
           @authors[auid]={
           :auid=>auid,

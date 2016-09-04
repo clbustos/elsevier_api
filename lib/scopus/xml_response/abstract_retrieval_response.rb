@@ -3,6 +3,7 @@ module Scopus
     class Abstractsretrievalresponse < XMLResponseGeneric
       attr_reader :scopus_id
       attr_reader :title
+      attr_reader :type_code
       attr_reader :type
       attr_reader :year
       attr_reader :journal
@@ -14,6 +15,9 @@ module Scopus
       attr_reader :doi
       attr_reader :affiliations
       attr_reader :abstract
+      attr_reader :subject_areas
+      attr_reader :author_keywords
+      attr_reader :book_title
       def inspect
         "#<#{self.class}:#{self.object_id} @title=#{@title} @journal=#{@journal} @authors=[#{@authors.keys.join(",")}]>"
       end
@@ -26,7 +30,7 @@ module Scopus
       # we have to improvise
       def search_affiliation(afid)
         x=xml.at_xpath("//affiliation[@afid=\"#{afid}\"]")
-        if(!x)
+        if !x
           raise "I can't find affiliation #{afid}"
         else
           name=x.xpath("organization").map{|e| e.text}.join(";")
@@ -37,10 +41,15 @@ module Scopus
       def process
         @scopus_id=process_path(xml,"//dc:identifier")
         @title=process_path(xml,"//dc:title")
-        @type=process_path(xml,"//xmlns:srctype")
-        @journal=process_path(xml,"//prism:publicationName")
-        @volume=process_path(xml,"//prism:volume")
-        @issue=process_path(xml,"//prism:issueIdentifier")
+        @type_code=process_path(xml,"//xmlns:srctype")
+        @type=process_path(xml,"//prism:aggregationType").downcase.to_sym
+        if @type_code=="j"
+          @journal=process_path(xml,"//prism:publicationName")
+          @volume=process_path(xml,"//prism:volume")
+          @issue=process_path(xml,"//prism:issueIdentifier")
+        elsif @type_code=="b"
+          @book_title=process_path(xml,"//prism:publicationName")
+        end
         @starting_page=process_path(xml,"//prism:startingPage")
         @ending_page=process_path(xml,"//prism:endingPage")
         @year=process_path(xml,"//year")
@@ -48,13 +57,29 @@ module Scopus
         #p @abstract
         @authors={}
         @affiliations={}
+        @author_keywords=[]
+        @subject_areas=[]
         
+        
+        xml.xpath("//xmlns:authkeywords/xmlns:author-keyword").each do |x|
+          @author_keywords.push(x.text)
+        end
+        xml.xpath("//xmlns:subject-areas/xmlns:subject-area").each do |x|
+          @subject_areas.push(
+            { :abbrev=>x.attribute("abbrev").value,
+              :code=>x.attribute("code").value.to_i,
+              :name=>x.text
+            }
+            )
+        end
+
         xml.xpath("/xmlns:abstracts-retrieval-response/xmlns:affiliation").each do |x|
           id=x.attribute("id").value
           name=process_path(x,"xmlns:affilname")
           city=process_path(x,"xmlns:affiliation-city")
           country=process_path(x,"xmlns:affiliation-country")
           @affiliations[id]={
+            :id       =>id,
             :name     =>name,
             :city     =>city,
             :country  =>country
