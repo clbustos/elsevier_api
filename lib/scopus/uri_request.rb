@@ -4,7 +4,7 @@ module URIRequest
   
     def get_uri_articles_country_year_area(country,year,area)
       query="AFFILCOUNTRY ( #{country} )  AND  PUBYEAR  =  #{year}  AND  SUBJAREA ( \"#{area}\" )"
-      ::URI.encode("http://api.elsevier.com/content/search/scopus?apiKey=#{key}&query=#{query}")
+      ::URI.encode("http://api.elsevier.com/content/search/scopus?apiKey=#{key}&sort=artnum&query=#{query}")
     end
     # Get URI to obtain list of articles from a specific 
     # journal. You could specify year

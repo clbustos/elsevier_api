@@ -52,7 +52,8 @@ describe "ARR parser of record 84958685689" do
           :id=>"60029498",
         :name=>"Universidade Estadual de Maringa",
         :city=>"Maringa",
-        :country=>"Brazil"
+        :country=>"Brazil",
+          :type=>:scopus
         }
     })
   end

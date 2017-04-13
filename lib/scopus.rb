@@ -12,12 +12,13 @@ module Scopus
     end
     
     def self.entries_to_csv(entries,csv_file)
-      require 'csv'      
-      header=["scopus_id","title","journal","creator","doi"]
+      require 'csv'
+      d=Date.today.to_s      
+      header=["scopus_id","title","journal","creator","doi","date"]
       CSV.open(csv_file,"wb") {|csv|
         csv << header
         entries.each {|e|
-          csv << [e[:scopus_id],e[:title],e[:journal], e[:creator],e[:doi]]
+          csv << [e[:scopus_id],e[:title],e[:journal], e[:creator],e[:doi],d]
         }
       }
     end
