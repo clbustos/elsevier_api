@@ -6,7 +6,8 @@ module Scopus
       attr_reader :scopus_id
       attr_reader :cited_by_count
       attr_reader :title
-      attr_reader :type_code
+      attr_reader :eid
+	attr_reader :type_code
       attr_reader :type
       attr_reader :year
       attr_reader :journal
@@ -271,7 +272,8 @@ module Scopus
         @title          = process_path(xml, "//dc:title")
         @doi            = process_path(xml, "//prism:doi")
         @doi||=search_doi
-        @type_code      = process_path(xml, "//xmlns:srctype")
+        @eid		= process_path(xml, "//xmlns:eid")
+	@type_code      = process_path(xml, "//xmlns:srctype")
         @cited_by_count = process_path(xml,"//xmlns:citedby-count").to_i
         @type           = process_path(xml, "//prism:aggregationType").downcase.to_sym
         if @type_code=="j" or @type_code=="p"
@@ -285,6 +287,7 @@ module Scopus
         @ending_page    =process_path(xml, "//prism:endingPage")
         @year           =process_path(xml, "//year")
         @abstract       =process_path(xml, "//dc:description/xmlns:abstract[@xml:lang='eng']/ce:para")
+	@abstract     ||=process_path(xml, "//abstract/ce:para")
       end
     end
   end

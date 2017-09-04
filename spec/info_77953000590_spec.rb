@@ -12,7 +12,8 @@ describe "ARR parser of record 77953000590" do
     expect(@xml.type).to eq(:journal)
     expect(@xml.journal).to eq("Annual Review of CyberTherapy and Telemedicine")
     expect(@xml.volume).to eq("7")
-
+    expect(@xml.eid).to eq("2-s2.0-77953000590")
+expect(@xml.abstract).to include("A new protocol is presented")
     expect(@xml.book_title).to be_nil
   end
 

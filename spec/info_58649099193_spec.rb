@@ -13,6 +13,8 @@ describe "ARR parser of record 58649099193" do
     expect(@xml.volume).to eq("34")
     expect(@xml.cited_by_count).to eq(27)
     expect(@xml.book_title).to be_nil
+    expect(@xml.doi).to eq("10.1177/1059601108329717")
+    expect(@xml.eid).to eq("2-s2.0-58649099193")
   end
 
   it "should include correct authors" do

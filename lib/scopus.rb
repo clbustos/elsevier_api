@@ -7,6 +7,7 @@ require "nokogiri"
 module Scopus
   # Factory method
     def self.process_xml(xml)
+      xml=Nokogiri::XML(xml) if xml.is_a? String
       name=xml.children[0].name.gsub("-","").capitalize
       Scopus::XMLResponse.const_get(name.to_sym).new(xml)
     end
