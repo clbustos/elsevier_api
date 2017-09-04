@@ -1,7 +1,27 @@
 
 module Scopus
 module URIRequest
-  
+
+    def get_uri_author(author_id,view=:light,opts={})
+      if author_id.is_a? (Array)
+        author_id=author_id.join(",")
+      end
+      opts={:view=>view.to_s.upcase}.merge(opts)
+      opts_s=opts.map {|v| "#{v[0].to_s}=#{v[1]}"}.join("&")
+      res=::URI.encode("http://api.elsevier.com/content/author?author_id=#{author_id}&apiKey=#{key}&#{opts_s}")
+      res
+    end
+    def get_uri_citation_overview(scopus_id,date,opts={})
+      if scopus_id.is_a? (Array)
+        scopus_id=scopus_id.join(",")
+      end
+      opts={:date=>date,:field=>"h-index,dc:identifier,scopus_id,pcc,cc,lcc,rangeCount,rowTotal,sort-year,prevColumnHeading,columnHeading,laterColumnHeading,prevColumnTotal,columnTotal,laterColumnTotal,rangeColumnTotal,grandTotal"}.merge(opts)
+      opts_s=opts.map {|v| "#{v[0].to_s}=#{v[1]}"}.join("&")
+      res=::URI.encode("http://api.elsevier.com/content/abstract/citations?scopus_id=#{scopus_id}&apiKey=#{key}&#{opts_s}")
+
+      res
+    end
+
     def get_uri_articles_country_year_area(country,year,area)
       query="AFFILCOUNTRY ( #{country} )  AND  PUBYEAR  =  #{year}  AND  SUBJAREA ( \"#{area}\" )"
       ::URI.encode("http://api.elsevier.com/content/search/scopus?apiKey=#{key}&sort=artnum&query=#{query}")

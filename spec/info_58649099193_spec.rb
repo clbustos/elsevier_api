@@ -11,7 +11,7 @@ describe "ARR parser of record 58649099193" do
     expect(@xml.type).to eq(:journal)
     expect(@xml.journal).to eq("Group and Organization Management")
     expect(@xml.volume).to eq("34")
-
+    expect(@xml.cited_by_count).to eq(27)
     expect(@xml.book_title).to be_nil
   end
 

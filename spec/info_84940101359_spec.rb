@@ -14,7 +14,8 @@ describe "ARR parser of record 84940101359" do
 
     expect(@xml.authors).to be_a Hash
     expect(@xml.authors.length).to eq(114)
-
+    #require 'pp'
+    #pp @xml.affiliations
   end
   it "should include correct author keywords" do
     expect(@xml).to respond_to :author_keywords
@@ -34,7 +35,10 @@ describe "ARR parser of record 84940101359" do
   it "should include correct affiliation " do
     expect(@xml).to respond_to :affiliations
     expect(@xml.affiliations).to be_a Hash
-    expect(@xml.affiliations.length).to eq(4)
+    
+    
+    expect(@xml.affiliations.length).to eq(22)
+    
     # First one will be a common affiliation
     expect(@xml.affiliations["60019674"]).to eq({ :id => "60019674",
                                                   :name => "Boston University",

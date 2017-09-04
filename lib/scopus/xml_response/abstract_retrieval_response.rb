@@ -1,7 +1,10 @@
 module Scopus
   module XMLResponse
     class Abstractsretrievalresponse < XMLResponseGeneric
+      NA_AFFILIATION="NAFD:**NA**"
+      NA_AFFILIATION_NAME="__No affiliation__"
       attr_reader :scopus_id
+      attr_reader :cited_by_count
       attr_reader :title
       attr_reader :type_code
       attr_reader :type
@@ -35,10 +38,7 @@ module Scopus
         process_author_groups
         process_authors
       end
-      def process_path(x, path)
-        node=x.at_xpath(path)
-        (node.nil?) ? nil : node.text
-      end
+
 
       # We can't find the affiliation the ussual way
       # we have to improvise
@@ -103,11 +103,17 @@ module Scopus
       # hashing the name and the country on unidentified filliations on 
       # head tag
       # The process only add the affiliation if name is not nil
+      
+      def get_id_affiliation(name,city,country)
+      "NS:"+Digest::MD5.hexdigest("#{name}|#{city}|#{country}")
+      end
       def add_unidentified_affilitations
         xml.xpath("//bibrecord/head/author-group/affiliation").each do |aff|
           next if aff.attribute("afid")
           city, country, id, name = get_affiliation_data(aff)
-          next if (name=="" and city=="") or country==""
+          next if (name=="" and city=="" and country=="")
+
+
           @affiliations[id]={
               :id => id,
               :name => name,
@@ -117,7 +123,17 @@ module Scopus
           }
         end
       end
-
+      def add_no_affiliation_case(auid)
+        id=NA_AFFILIATION+":"+Digest::MD5.hexdigest("#{@scopus_id}|#{auid}")
+        @affiliations[id]={
+              :id => id,
+              :name => "#{@scopus_id}|#{auid}",
+              :city => "",
+              :country => "NO_COUNTRY",
+              :type=>:non_scopus
+          }
+          id
+      end
       def get_affiliation_data(aff)
         organization=aff.xpath("organization").map { |e| e.text }.join(";")
         address=aff.xpath("address-part").map { |e| e.text }.join(";")
@@ -126,7 +142,12 @@ module Scopus
         city_part=aff.xpath("city-group").text
         city= city_only!="" ? city_only : city_part
         country=aff.xpath("country").text
-        id="NS:"+Digest::MD5.hexdigest("#{name}|#{city}|#{country}")
+
+        name="UNKOWN ORG FOR #{@scopus_id} ARTICLE" if name==""
+        country="NO_COUNTRY" if country==""
+
+
+        id=get_id_affiliation(name,city,country)
         return city, country, id, name
       end
 
@@ -139,7 +160,7 @@ module Scopus
             if aff_node=ag.at_xpath("affiliation")
               city,country,afid1,name=get_affiliation_data(aff_node)
               aff_id2=get_affiliation_id(ag.at_xpath("affiliation"))
-              if (name=="" and city=="") or country==""
+              if (name=="" and city=="" and country=="")
                 aff_id=nil
               else
                 aff_id=aff_id2
@@ -176,7 +197,7 @@ module Scopus
           surname=process_path(x, "xmlns:preferred-name/ce:surname")
           affiliation=nil
           affiliation_node=x.xpath("xmlns:affiliation")
-          #p affiliation_node
+          
           if affiliation_node.length==1
             affiliation=affiliation_node[0].attribute("id").text
             if !affiliation.nil? and @affiliations[affiliation].nil?
@@ -196,10 +217,13 @@ module Scopus
             res=@author_groups.find{|ag|
               ag[:authors].include? auid
             }
+            
             if res
               affiliation=res[:affiliation]
-            else
-              affiliation=nil
+            end
+            if affiliation.nil?
+              # Affiliation shouldn't be nil. We create a custom affiliation for this cases
+              affiliation=add_no_affiliation_case(auid)
             end
 
             #
@@ -243,23 +267,24 @@ module Scopus
       end
 
       def process_basic_metadata
-        @scopus_id=process_path(xml, "//dc:identifier")
-        @title=process_path(xml, "//dc:title")
-        @doi=process_path(xml, "//prism:doi")
+        @scopus_id      = process_path(xml, "//dc:identifier")
+        @title          = process_path(xml, "//dc:title")
+        @doi            = process_path(xml, "//prism:doi")
         @doi||=search_doi
-        @type_code=process_path(xml, "//xmlns:srctype")
-        @type=process_path(xml, "//prism:aggregationType").downcase.to_sym
+        @type_code      = process_path(xml, "//xmlns:srctype")
+        @cited_by_count = process_path(xml,"//xmlns:citedby-count").to_i
+        @type           = process_path(xml, "//prism:aggregationType").downcase.to_sym
         if @type_code=="j" or @type_code=="p"
-          @journal=process_path(xml, "//prism:publicationName")
-          @volume=process_path(xml, "//prism:volume")
-          @issue=process_path(xml, "//prism:issueIdentifier")
+          @journal      =process_path(xml, "//prism:publicationName")
+          @volume       =process_path(xml, "//prism:volume")
+          @issue        =process_path(xml, "//prism:issueIdentifier")
         elsif @type_code=="b"
-          @book_title=process_path(xml, "//prism:publicationName")
+          @book_title   =process_path(xml, "//prism:publicationName")
         end
-        @starting_page=process_path(xml, "//prism:startingPage")
-        @ending_page=process_path(xml, "//prism:endingPage")
-        @year=process_path(xml, "//year")
-        @abstract=process_path(xml, "//dc:description/xmlns:abstract[@xml:lang='eng']/ce:para")
+        @starting_page  =process_path(xml, "//prism:startingPage")
+        @ending_page    =process_path(xml, "//prism:endingPage")
+        @year           =process_path(xml, "//year")
+        @abstract       =process_path(xml, "//dc:description/xmlns:abstract[@xml:lang='eng']/ce:para")
       end
     end
   end

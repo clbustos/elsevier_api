@@ -8,6 +8,7 @@ describe "ARR parser of record 84958685689" do
     expect(@xml.title).to eq("The being in activity in leontiev's work and the social nature of psychism")
     expect(@xml.type).to eq(:book)
     expect(@xml.journal).to be_nil
+    expect(@xml.cited_by_count).to eq(0)
     expect(@xml.book_title).to eq("Vygotsky and Leontiev: The Construction of a Marxist Psychology")
   end
   it "should include correct authors" do
