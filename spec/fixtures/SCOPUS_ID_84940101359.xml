@@ -885,7 +885,7 @@
         <itemidlist> <itemid idtype="PUI">605818206</itemid> <itemid idtype="CAR-ID">639337220</itemid> <itemid idtype="EMBASE">2015336041</itemid> <itemid idtype="SCP">84940101359</itemid> <itemid idtype="SGR">84940101359</itemid> </itemidlist>
         <history> <date-created day="03" month="09" year="2015"/> </history>
         <dbcollection>EMBASE</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

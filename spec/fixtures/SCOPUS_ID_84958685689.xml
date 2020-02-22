@@ -87,7 +87,7 @@
         <itemidlist> <itemid idtype="PUI">608555322</itemid> <itemid idtype="CAR-ID">646099696</itemid> <itemid idtype="SNBOOK">2016099831</itemid> <itemid idtype="SCP">84958685689</itemid> <itemid idtype="SGR">84958685689</itemid> </itemidlist>
         <history> <date-created day="26" month="02" timestamp="BST 02:38:41" year="2016"/> </history>
         <dbcollection>SNBOOK</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

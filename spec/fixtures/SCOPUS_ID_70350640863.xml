@@ -89,7 +89,7 @@
         <history> <date-created day="09" month="11" year="2009"/> </history>
         <dbcollection>SNPSYB</dbcollection>
         <dbcollection>MEDL</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

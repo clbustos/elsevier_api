@@ -1,18 +1,26 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'scopus'
-require 'rspec'
-module Helpers
+require 'simplecov'
+unless ENV['NO_COVERAGE']
+  SimpleCov.start do
+    add_filter '/spec/'
+  end
+end
+
+require_relative '../lib/elsevier_api'
+
+module ElsevierApiMixin
   def load_arr(file)
     rev_xml=File.dirname(File.expand_path(__FILE__))+"/fixtures/#{file}"
-    $xml=File.open(rev_xml) { |f|
+    xml=File.open(rev_xml) { |f|
       Nokogiri::XML(f)
     }
-    Scopus.process_xml($xml)
+  ElsevierApi.process_xml(xml)
+  end
+
+  def api_available?
+    !ENV['ELSEVIER_API_KEY'].nil?
   end
 
 end
 
 
-RSpec.configure do |c|
-  c.include Helpers
-end
+RSpec.configure { |c| c.include ElsevierApiMixin }

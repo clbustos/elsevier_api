@@ -154,7 +154,7 @@
 </history>
         <dbcollection>EMBASE</dbcollection>
         <dbcollection>NURSNG</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

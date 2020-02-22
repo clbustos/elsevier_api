@@ -119,7 +119,7 @@
           <date-created day="30" month="03" year="2011"/>
         </history>
         <dbcollection>SNSOC</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

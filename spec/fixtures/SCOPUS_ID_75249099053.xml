@@ -114,7 +114,7 @@
 <date-created day="02" month="02" year="2010"/>
 </history>
         <dbcollection>SNPSYB</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>

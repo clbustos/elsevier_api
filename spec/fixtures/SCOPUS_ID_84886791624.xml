@@ -132,7 +132,7 @@
           <date-created day="30" month="05" year="2013"/>
         </history>
         <dbcollection>SNSOC</dbcollection>
-        <dbcollection>Scopusbase</dbcollection>
+        <dbcollection>ElsevierApibase</dbcollection>
       </item-info>
       <head>
         <citation-info>
