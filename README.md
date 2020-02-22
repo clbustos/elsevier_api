@@ -1,4 +1,4 @@
-# elsevier-api
+# elsevier_api
 
 Provides access to Elsevier dev services for Ruby. You require an API from https://dev.elsevier.com/apikey/ first.
 
@@ -8,7 +8,7 @@ Provides access to Elsevier dev services for Ruby. You require an API from https
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'elsevier-api'
+gem 'elsevier_api'
 ```
 
 And then execute:
@@ -17,7 +17,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install elservier-api
+    $ gem install elservier_api
 
 ## Usage
 
