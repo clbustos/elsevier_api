@@ -18,6 +18,7 @@ describe "connection to Elsevier host" do
     else
 
       result= @conn.retrieve_response("https://api.elsevier.com/content/author?author_id=56609918400&view=LIGHT")
+      puts(result)
       expect(@conn.error).to be_falsey
       expect(result).to be_instance_of(ElsevierApi::XMLResponse::Authorretrievalresponse)
     end

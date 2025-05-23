@@ -25,6 +25,9 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+require 'addressable/template'
+
 module ElsevierApi
 module URIRequest
 
@@ -32,33 +35,51 @@ module URIRequest
       if author_id.is_a? (Array)
         author_id=author_id.join(",")
       end
-      opts={:view=>view.to_s.upcase}.merge(opts)
-      opts_s=opts.map {|v| "#{v[0].to_s}=#{v[1]}"}.join("&")
-      res=::URI.encode("https://api.elsevier.com/content/author?author_id=#{author_id}&#{opts_s}")
-      res
+
+      opts={:author_id=>author_id, :view=>view.to_s.upcase}.merge(opts)
+
+      template = Addressable::Template.new("https://api.elsevier.com/content/author{?query*}")
+      template.expand({
+                        "query" => opts
+                      }).to_s
+
     end
+
     def get_uri_citation_overview(scopus_id,date,opts={})
       if scopus_id.is_a? (Array)
         scopus_id=scopus_id.join(",")
       end
-      opts={:date=>date,:field=>"h-index,dc:identifier,scopus_id,pcc,cc,lcc,rangeCount,rowTotal,sort-year,prevColumnHeading,columnHeading,laterColumnHeading,prevColumnTotal,columnTotal,laterColumnTotal,rangeColumnTotal,grandTotal"}.merge(opts)
-      opts_s=opts.map {|v| "#{v[0].to_s}=#{v[1]}"}.join("&")
-      res=::URI.encode("https://api.elsevier.com/content/abstract/citations?scopus_id=#{scopus_id}&#{opts_s}")
+      opts={:scopus_id=>scopus_id, :date=>date,:field=>"h-index,dc:identifier,scopus_id,pcc,cc,lcc,rangeCount,rowTotal,sort-year,prevColumnHeading,columnHeading,laterColumnHeading,prevColumnTotal,columnTotal,laterColumnTotal,rangeColumnTotal,grandTotal"}.merge(opts)
+      template = Addressable::Template.new("https://api.elsevier.com/content/abstract/citations{?query*}")
+      template.expand({
+                        "query" => opts
+                      }).to_s
 
-      res
     end
 
     def get_uri_articles_country_year_area(country,year,area)
       query="AFFILCOUNTRY ( #{country} )  AND  PUBYEAR  =  #{year}  AND  SUBJAREA ( \"#{area}\" )"
-      ::URI.encode("https://api.elsevier.com/content/search/scopus?sort=artnum&query=#{query}")
+
+      opts={:sort=>'artnum', :query=>query}
+      template = Addressable::Template.new("https://api.elsevier.com/content/search/scopus{?query*}")
+      template.expand({
+                        "query" => opts
+                      }).to_s
     end
     # Get URI to obtain list of articles from a specific 
     # journal. You could specify year
     def get_uri_journal_articles(journal,year=nil)
-    query="EXACTSRCTITLE(\"#{journal}\")"
-    query+=" AND PUBYEAR IS #{year}" if year
-    ::URI.encode("https://api.elsevier.com/content/search/scopus?apiKey=#{key}&query=#{query}")
+      query="EXACTSRCTITLE(\"#{journal}\")"
+      query+=" AND PUBYEAR IS #{year}" if year
+      opts={:query=>query}
+      template = Addressable::Template.new("https://api.elsevier.com/content/search/scopus{?query*}")
+
+      template.expand({
+                        "query" => opts
+                      }).to_s
+
     end
+
     def get_uri_abstract(id,type="scopus_id",opts={:view=>"FULL"})
     raise "Type should be a string" unless type.is_a? String
     if opts[:view]
@@ -66,7 +87,13 @@ module URIRequest
     elsif opts[:field]
       opts_s="field=#{opts[:field]}"
     end
-    ::URI.encode("https://api.elsevier.com/content/abstract/#{type}/#{id}?#{opts_s}")
+
+    template = Addressable::Template.new("https://api.elsevier.com/content/abstract/#{type}/#{id}{?query*}")
+
+    template.expand({
+                      "query" => opts_s
+                    }).to_s
+
     end
 
   end

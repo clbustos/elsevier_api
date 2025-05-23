@@ -10,7 +10,9 @@ describe "parser of an abstractCitationResponse object" do
     @connection=ElsevierApi::Connection.new("fauxkey")
   }
   it "get correct URI for a request" do
-    expect(@connection.get_uri_citation_overview([33847321982,34047259984], "2009-2016")).to eq("https://api.elsevier.com/content/abstract/citations?scopus_id=33847321982,34047259984&date=2009-2016&field=h-index,dc:identifier,scopus_id,pcc,cc,lcc,rangeCount,rowTotal,sort-year,prevColumnHeading,columnHeading,laterColumnHeading,prevColumnTotal,columnTotal,laterColumnTotal,rangeColumnTotal,grandTotal")
+    url="https://api.elsevier.com/content/abstract/citations?scopus_id=33847321982%2C34047259984&date=2009-2016&field=h-index%2Cdc%3Aidentifier%2Cscopus_id%2Cpcc%2Ccc%2Clcc%2CrangeCount%2CrowTotal%2Csort-year%2CprevColumnHeading%2CcolumnHeading%2ClaterColumnHeading%2CprevColumnTotal%2CcolumnTotal%2ClaterColumnTotal%2CrangeColumnTotal%2CgrandTotal"
+    #puts(@connection.get_uri_citation_overview([33847321982,34047259984], "2009-2016"))
+    expect(@connection.get_uri_citation_overview([33847321982,34047259984], "2009-2016")).to eq(url)
   end
   it "should include correct raw information" do
     expect(@xml1.h_index).to eq(1)
